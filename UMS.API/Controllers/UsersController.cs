@@ -24,9 +24,7 @@ namespace UMS.API.Controllers
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _jwtTokenHelper = jwtTokenHelper; ;
         }
-       
 
-      
         [HttpPost("signup")]
         public async Task<IActionResult> Signup([FromBody] RegisterUserDto registerUserDto)
         {
@@ -104,18 +102,17 @@ namespace UMS.API.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
-
-        public async Task<AuthenticateResponseDto> AuthenticateUserAsync(string username, string password)
+        private async Task<AuthenticateResponseDto> AuthenticateUserAsync(string username, string password)
         {
-            var user = await _unitOfWork.User.GetUserByUsernameAsync(username);
+            // Validate inputs
+            ValidateCredentials(username, password);
 
-            if (user == null)
-            {
-                throw new Exception("User not found.");
-            }
+            // Retrieve the user by username
+            var user = await _unitOfWork.User.GetUserByUsernameAsync(username)
+                      ?? throw new Exception("User not found."); // Null coalescing operator for cleaner code
 
             // Verify the password
-            if (!BCrypt.Net.BCrypt.Verify(password + "^XX4-44p", user.PasswordHash))
+            if (!VerifyPassword(password, user.PasswordHash))
             {
                 throw new Exception("Invalid password.");
             }
@@ -126,6 +123,27 @@ namespace UMS.API.Controllers
             // Return the response DTO with user's details and token
             return new AuthenticateResponseDto(user.FirstName, user.LastName, token);
         }
+
+        //  input validation
+        private void ValidateCredentials(string username, string password)
+        {
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                throw new ArgumentException("Username cannot be null or empty.", nameof(username));
+            }
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new ArgumentException("Password cannot be null or empty.", nameof(password));
+            }
+        }
+
+        //  password verification
+        private bool VerifyPassword(string password, string storedHash)
+        {
+            return BCrypt.Net.BCrypt.Verify(password + "^XX4-44p", storedHash);
+        }
+
         [Authorize]
         [HttpGet("balance")]
         public async Task<IActionResult> GetBalance()
@@ -133,7 +151,7 @@ namespace UMS.API.Controllers
             try
             {
                 // Extract username from the JWT token claims
-                var username = User.Identity.Name;
+                var username = User?.Identity?.Name;
 
                 if (string.IsNullOrEmpty(username))
                 {

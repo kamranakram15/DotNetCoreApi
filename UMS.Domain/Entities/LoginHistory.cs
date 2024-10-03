@@ -18,6 +18,6 @@ namespace UMS.Domain.Entities
         public bool IsFirstLogin { get; set; } // Flag to indicate first login
 
         // Navigation property
-        public virtual User User { get; set; } // Navigation property to User
+        public virtual User? User { get; set; } // Navigation property to User
     }
 }

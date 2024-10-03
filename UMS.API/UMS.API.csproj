@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\WeatherForecastController.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BCrypt" Version="1.0.0" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
@@ -27,6 +31,10 @@
     <ProjectReference Include="..\UMS.Application\UMS.Application.csproj" />
     <ProjectReference Include="..\UMS.Domain\UMS.Domain.csproj" />
     <ProjectReference Include="..\UMS.Infrastructure\UMS.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="PostmanCollection\" />
   </ItemGroup>
 
 </Project>
