@@ -52,34 +52,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // Add Swagger services
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "JwtAuthApi", Version = "v1" });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
-        Description = "Enter 'Bearer' [space] and then your token in the text input below. \n\nExample: 'Bearer 12345abcdef'",
-    });
-});
+
 
 var app = builder.Build();
-
-// Enable Swagger only in development
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.UseCors(policy =>
-    {
-        policy.WithOrigins("https://localhost:7109", "https://localhost:7109")
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .WithHeaders(HeaderNames.ContentType);
-    });
-}
 
 app.UseHttpsRedirection();
 app.UseAuthentication(); // JWT Authentication middleware
